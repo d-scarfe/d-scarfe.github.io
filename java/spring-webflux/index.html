@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Building a REST API with Spring WebFlux | Daniel Scarfe</title><meta name="Description" content="Hugo theme - LoveIt"><meta property="og:title" content="Building a REST API with Spring WebFlux" />
+<meta property="og:description" content="In this article, we&rsquo;re going to build a reactive REST API in Java using Spring&rsquo;s WebFlux and annotation processing.
+We&rsquo;ll demonstrate how to make use of Flux and Mono publishers to serve JSON content to the client.
+This tutorial shall provide the basis from which we can build a reactive, scalable web backend in Java.
+Introducing Spring WebFlux Why choose WebFlux? WebFlux is Spring&rsquo;s answer to the need for a non-blocking web stack that handles concurrency with fewer threads, and scales with less reliance upon physical hardware." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://scarfe.uk/java/spring-webflux/" /><meta property="og:image" content="https://scarfe.uk/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-05-30T06:00:00+01:00" />
+<meta property="article:modified_time" content="2022-05-30T06:00:00+01:00" /><meta property="og:site_name" content="scarfe.uk" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://scarfe.uk/logo.png"/>
+
+<meta name="twitter:title" content="Building a REST API with Spring WebFlux"/>
+<meta name="twitter:description" content="In this article, we&rsquo;re going to build a reactive REST API in Java using Spring&rsquo;s WebFlux and annotation processing.
+We&rsquo;ll demonstrate how to make use of Flux and Mono publishers to serve JSON content to the client.
+This tutorial shall provide the basis from which we can build a reactive, scalable web backend in Java.
+Introducing Spring WebFlux Why choose WebFlux? WebFlux is Spring&rsquo;s answer to the need for a non-blocking web stack that handles concurrency with fewer threads, and scales with less reliance upon physical hardware."/>
+<meta name="application-name" content="scarfe.uk">
+<meta name="apple-mobile-web-app-title" content="scarfe.uk"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://scarfe.uk/java/spring-webflux/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Building a REST API with Spring WebFlux",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/scarfe.uk\/java\/spring-webflux\/"
+        },"image": ["https:\/\/scarfe.uk\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "rest, java, spring, reactive, web","wordcount":  2482 ,
+        "url": "https:\/\/scarfe.uk\/java\/spring-webflux\/","datePublished": "2022-05-30T06:00:00+01:00","dateModified": "2022-05-30T06:00:00+01:00","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "https:\/\/scarfe.uk\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "Daniel Scarfe"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('light' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'light' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Daniel Scarfe">scarfe.uk</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/categories/java/"> Java </a><a class="menu-item" href="/categories/scala/"> Scala </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Daniel Scarfe">scarfe.uk</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/categories/java/" title="">Java</a><a class="menu-item" href="/categories/scala/" title="">Scala</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Building a REST API with Spring WebFlux</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-category"><a href="/categories/java/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>java</a>&nbsp;|&nbsp;
+                    </span><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-05-30">2022-05-30</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2482 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;12 minutes&nbsp;
+                <span style="float: right"><i>Last updated on 2022-05-30</i></span>
+            </div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#introducing-spring-webflux">Introducing Spring WebFlux</a>
+      <ul>
+        <li><a href="#why-choose-webflux">Why choose WebFlux?</a></li>
+        <li><a href="#who-is-using-webflux">Who is using WebFlux?</a></li>
+      </ul>
+    </li>
+    <li><a href="#our-mission">Our Mission</a>
+      <ul>
+        <li><a href="#what-are-we-making">What are we making?</a></li>
+        <li><a href="#what-do-i-need">What do I need?</a></li>
+      </ul>
+    </li>
+    <li><a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#initial-setup">Initial setup</a></li>
+        <li><a href="#project-structure">Project structure</a></li>
+      </ul>
+    </li>
+    <li><a href="#introducing-flux--mono">Introducing Flux &amp; Mono</a></li>
+    <li><a href="#annotation-approach">Annotation Approach</a>
+      <ul>
+        <li><a href="#defining-the-data-model">Defining the data model</a></li>
+        <li><a href="#creating-a-controller">Creating a controller</a></li>
+        <li><a href="#creating-a-client">Creating a client</a></li>
+        <li><a href="#running-the-application">Running the application</a></li>
+      </ul>
+    </li>
+    <li><a href="#functional-approach">Functional Approach</a>
+      <ul>
+        <li><a href="#implementing-a-service">Implementing a service</a></li>
+        <li><a href="#creating-the-handler">Creating the handler</a></li>
+        <li><a href="#defining-our-routes">Defining our routes</a></li>
+      </ul>
+    </li>
+    <li><a href="#automated-testing">Automated Testing</a>
+      <ul>
+        <li><a href="#validating-a-flux-response">Validating a Flux response</a></li>
+        <li><a href="#validating-a-mono-response">Validating a Mono response</a></li>
+        <li><a href="#validating-error-scenarios">Validating error scenarios</a></li>
+      </ul>
+    </li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>In this article, we&rsquo;re going to build a <em>reactive</em> REST API in Java using Spring&rsquo;s WebFlux and annotation processing.</p>
+<p>We&rsquo;ll demonstrate how to make use of <code>Flux</code> and <code>Mono</code> publishers to serve JSON content to the client.</p>
+<p>This tutorial shall provide the basis from which we can build a reactive, scalable web backend in Java.</p>
+<h2 id="introducing-spring-webflux">Introducing Spring WebFlux</h2>
+<h3 id="why-choose-webflux">Why choose WebFlux?</h3>
+<p>WebFlux is Spring&rsquo;s answer to the need for a non-blocking web stack that handles concurrency with fewer threads, and scales with less reliance upon physical hardware. WebFlux builds upon <a href="https://projectreactor.io/" target="_blank" rel="noopener noreffer">Project Reactor</a>, a well-loved enterprise framework that provides non-blocking message parsing with a focus on low memory usage &amp; a high throughput.</p>
+<p>Let us first recap how Spring MVC functions, which many of us are familiar with. In this implementation, a single thread is created to service each request. Whilst this approach is easy to debug &amp; understand, each thread typically utilises 1MB of heap to fulfil the request. When faced with many concurrent users, this approach can present a number of scaling issues.</p>
+<p>In contrast, WebFlux&rsquo;s reactive model keeps the thread pool small. The non-blocking approach brings about a significant leap in performance, whilst the annotation-based processing feels familiar &amp; comfortable for those who have worked with Spring before. if you are looking to produce a reactive Java backend, in an environment where efficiency and/or resource utilisation are of utmost importance, WebFlux is the perfect tool.</p>
+<p>But allow me to be clear, whilst reactive frameworks are powerful &amp; scale well, they can be more difficult to implement &amp; debug. If you have a Spring MVC application that is sufficient for your needs, there is no need to convert it to WebFlux. The old mantra of &ldquo;if it ain&rsquo;t broke, don&rsquo;t fix it&rdquo; applies!</p>
+<h3 id="who-is-using-webflux">Who is using WebFlux?</h3>
+<p>WebFlux facilitates the backend for a number of large organisations working in Java. One notable example includes <em>JP Morgan</em>, whose financial platform is used by hundreds of thousands of clients around the world. Their application therefore needs to service a large number of concurrent requests in a trading environment where high throughput is vital. The reactive model is cornerstone to this solution.</p>
+<h2 id="our-mission">Our Mission</h2>
+<h3 id="what-are-we-making">What are we making?</h3>
+<p>In the following example, we&rsquo;ll build a reactive REST API which provides a number of endpoints capable of responding to HTTP requests.</p>
+<p>We will start by implementing some simple GET endpoints, and then we will add support for POST requests.</p>
+<p>We shall test the API by performing some basic CRUD operations to manipulate an example in-memory dataset.</p>
+<h3 id="what-do-i-need">What do I need?</h3>
+<p>This article assumes that the reader has already installed JDK 8 onwards, alongside a recent version of Apache Maven.</p>
+<p>There are no other requirements for this project. All testing will be done within Java.</p>
+<h2 id="getting-started">Getting Started</h2>
+<h3 id="initial-setup">Initial setup</h3>
+<p>Let&rsquo;s create a new Maven project, and add the following WebFlux dependency:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="nt">&lt;dependency&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-webflux<span class="nt">&lt;/artifactId&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;version&gt;</span>2.7.0<span class="nt">&lt;/version&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;/dependency&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This will pull in a number of required dependencies, including:</p>
+<ul>
+<li><code>spring-boot-starter</code> to provide us with a Spring Boot base.</li>
+<li><code>spring-webflux</code> to provide us with our WebFlux framework.</li>
+<li><code>reactor-core</code> to provide us with the reactive streams API.</li>
+<li><code>reactor-netty</code> to provide us with an embedded web server.</li>
+</ul>
+<p>The version <code>2.7.0</code> was correct at the time of writing, but it is always worth validating against <a href="https://search.maven.org/search?q=g:org.springframework.boot%20AND%20a:spring-boot-starter-webflux" target="_blank" rel="noopener noreffer">Maven Central</a>.</p>
+<h3 id="project-structure">Project structure</h3>
+<p>Since we have a blank project, let&rsquo;s go ahead and create the following directories:</p>
+<ul>
+<li><code>src/main/java/uk/scarfe/webflux/</code> which will be our base package for the project.</li>
+<li><code>.../webflux/model</code> which shall contain our example data model.</li>
+<li><code>.../webflux/annotation</code> which will demonstrate annotation-based WebFlux deployment.</li>
+<li><code>.../webflux/functional</code> which will demonstrate functional style WebFlux deployment.</li>
+</ul>
+<p>Later we will add some automated tests, but we needn&rsquo;t worry about those for now.</p>
+<h2 id="introducing-flux--mono">Introducing Flux &amp; Mono</h2>
+<p>Before we get started with our Webflux application, we must familiarise ourselves with its two publisher implementations, <code>Flux</code> and <code>Mono</code>.</p>
+<p><code>Mono</code> is a Publisher that emits <em>at most</em> 1 element:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">Mono</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">mono</span> <span class="o">=</span> <span class="n">Mono</span><span class="o">.</span><span class="na">just</span><span class="o">(</span><span class="s">&#34;Daniel&#34;</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">Mono</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">&gt;</span> <span class="n">monoEmpty</span> <span class="o">=</span> <span class="n">Mono</span><span class="o">.</span><span class="na">empty</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl"><span class="n">Mono</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">&gt;</span> <span class="n">monoError</span> <span class="o">=</span> <span class="n">Mono</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="k">new</span> <span class="n">RuntimeException</span><span class="o">());</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In contrast, <code>Flux</code> is a publisher that emits <em>0</em> to <em>n</em> number of elements:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">Flux</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">flux</span> <span class="o">=</span> <span class="n">Flux</span><span class="o">.</span><span class="na">just</span><span class="o">(</span><span class="n">1</span><span class="o">,</span> <span class="n">2</span><span class="o">,</span> <span class="n">3</span><span class="o">,</span> <span class="n">4</span><span class="o">,</span> <span class="n">5</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">Flux</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">fluxString</span> <span class="o">=</span> <span class="n">Flux</span><span class="o">.</span><span class="na">fromArray</span><span class="o">(</span><span class="k">new</span> <span class="n">String</span><span class="o">[]{</span><span class="s">&#34;A&#34;</span><span class="o">,</span> <span class="s">&#34;B&#34;</span><span class="o">,</span> <span class="s">&#34;C&#34;</span><span class="o">});</span>
+</span></span><span class="line"><span class="cl"><span class="n">Flux</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">fluxIterable</span> <span class="o">=</span> <span class="n">Flux</span><span class="o">.</span><span class="na">fromIterable</span><span class="o">(</span><span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="s">&#34;A&#34;</span><span class="o">,</span> <span class="s">&#34;B&#34;</span><span class="o">,</span> <span class="s">&#34;C&#34;</span><span class="o">));</span>
+</span></span><span class="line"><span class="cl"><span class="n">Flux</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">fluxRange</span> <span class="o">=</span> <span class="n">Flux</span><span class="o">.</span><span class="na">range</span><span class="o">(</span><span class="n">0</span><span class="o">,</span> <span class="n">10</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">Flux</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span> <span class="n">fluxLong</span> <span class="o">=</span> <span class="n">Flux</span><span class="o">.</span><span class="na">interval</span><span class="o">(</span><span class="n">Duration</span><span class="o">.</span><span class="na">ofSeconds</span><span class="o">(</span><span class="n">60</span><span class="o">));</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The <code>Flux</code> instance returns a sequence of elements and notifies upon completion.</p>
+<p>Note that despite creating the <code>Flux</code> instance, the data will not flow until <code>.subscribe()</code> is called:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">dataStream</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+</span></span><span class="line"><span class="cl"><span class="n">Flux</span><span class="o">.</span><span class="na">just</span><span class="o">(</span><span class="s">&#34;Daniel&#34;</span><span class="o">,</span> <span class="s">&#34;David&#34;</span><span class="o">,</span> <span class="s">&#34;Dory&#34;</span><span class="o">,</span> <span class="s">&#34;Diana&#34;</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">    <span class="o">.</span><span class="na">log</span><span class="o">()</span>
+</span></span><span class="line"><span class="cl">    <span class="o">.</span><span class="na">subscribe</span><span class="o">(</span><span class="n">dataStream</span><span class="o">::</span><span class="n">add</span><span class="o">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Project Reactor also provides us with a number of stream-based operators, including <code>.map()</code>/<code>.flatMap()</code>/<code>.merge()</code>/<code>.concat()</code> and more.</p>
+<p>Readers should take a moment to familiarise themselves with <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/concurrent/Flow.Publisher.html" target="_blank" rel="noopener noreffer">the API</a>, as it is an incredibly powerful toolset when mastered.</p>
+<h2 id="annotation-approach">Annotation Approach</h2>
+<h3 id="defining-the-data-model">Defining the data model</h3>
+<p>Let&rsquo;s go ahead and create our application. We start by creating a POJO that will store some example data.</p>
+<p>In this instance, we&rsquo;re going to create an <code>Employee</code> class under the <code>model</code> namespace:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nn">uk.scarfe.webflux.model</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">java.util.Objects</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Employee</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">id</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="nf">Employee</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="o">-</span><span class="n">1</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="s">&#34;&#34;</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="nf">Employee</span><span class="o">(</span><span class="kt">long</span> <span class="n">id</span><span class="o">,</span> <span class="n">String</span> <span class="n">name</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">this</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">long</span> <span class="nf">getId</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">id</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">name</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nd">@Override</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">equals</span><span class="o">(</span><span class="n">Object</span> <span class="n">o</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="o">(</span><span class="k">this</span> <span class="o">==</span> <span class="n">o</span><span class="o">)</span> <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="o">(</span><span class="n">o</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">getClass</span><span class="o">()</span> <span class="o">!=</span> <span class="n">o</span><span class="o">.</span><span class="na">getClass</span><span class="o">())</span> <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Employee</span> <span class="n">employee</span> <span class="o">=</span> <span class="o">(</span><span class="n">Employee</span><span class="o">)</span> <span class="n">o</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">id</span> <span class="o">==</span> <span class="n">employee</span><span class="o">.</span><span class="na">id</span> <span class="o">&amp;&amp;</span> <span class="n">Objects</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="n">employee</span><span class="o">.</span><span class="na">name</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nd">@Override</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">hashCode</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">Objects</span><span class="o">.</span><span class="na">hash</span><span class="o">(</span><span class="n">id</span><span class="o">,</span> <span class="n">name</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In the above example, we have created a basic immutable class that stores an employee ID and a name.</p>
+<p>It should be noted that we need the default no-args constructor to faciliate serialisation of the data.</p>
+<p>We&rsquo;ve implemented an <code>.equals()</code> and <code>.hashCode()</code> so we can identify two equal Employee instances.</p>
+<h3 id="creating-a-controller">Creating a controller</h3>
+<p>Now we need to create a controller who is responsible for handling our request and creating the response.</p>
+<p>Let&rsquo;s add an <code>EmployeeController</code> class under the <code>controllers</code> package:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nn">uk.scarfe.webflux.annotation</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.GetMapping</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RestController</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">reactor.core.publisher.Flux</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">uk.scarfe.webflux.model.Employee</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">java.util.Arrays</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@RestController</span>
+</span></span><span class="line"><span class="cl"><span class="nd">@RequestMapping</span><span class="o">(</span><span class="s">&#34;/employees&#34;</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">EmployeeController</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Employee</span><span class="o">&gt;</span> <span class="n">EMPLOYEES</span> <span class="o">=</span>
+</span></span><span class="line"><span class="cl">            <span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="k">new</span> <span class="n">Employee</span><span class="o">(</span><span class="n">1</span><span class="o">,</span> <span class="s">&#34;Daniel Scarfe&#34;</span><span class="o">),</span> <span class="k">new</span> <span class="n">Employee</span><span class="o">(</span><span class="n">2</span><span class="o">,</span> <span class="s">&#34;Joe Bloggs&#34;</span><span class="o">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nd">@GetMapping</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">Flux</span><span class="o">&lt;</span><span class="n">Employee</span><span class="o">&gt;</span> <span class="nf">getAll</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">Flux</span><span class="o">.</span><span class="na">fromIterable</span><span class="o">(</span><span class="n">EMPLOYEES</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This simple reactive class provides a GET mapping for <code>/employees</code> that will return a <code>Flux</code> object containing two hard-coded <code>Employee</code> instances.</p>
+<p>In practice, you would likely retrieve your content from a data store, but we are merely demonstrating the reactive layer here.</p>
+<h3 id="creating-a-client">Creating a client</h3>
+<p>Now we have our server-side implementation, we can make use of a Spring&rsquo;s <code>WebClient</code> to provide client-side access.</p>
+<p>The <code>WebClient</code> is Spring&rsquo;s non-blocking approach to performing HTTP requests.</p>
+<p>Let&rsquo;s implement an <code>EmployeeClient</code> class which connects to the default port of 8080:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nn">uk.scarfe.webflux.annotation</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">reactor.core.publisher.Flux</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.http.MediaType</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.web.reactive.function.client.WebClient</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">uk.scarfe.webflux.model.Employee</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@Component</span>
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">EmployeeClient</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">BASE_URL</span> <span class="o">=</span> <span class="s">&#34;http://localhost:8080&#34;</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="kd">final</span> <span class="n">WebClient</span> <span class="n">client</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="nf">EmployeeClient</span><span class="o">(</span><span class="n">WebClient</span><span class="o">.</span><span class="na">Builder</span> <span class="n">builder</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">this</span><span class="o">.</span><span class="na">client</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="na">baseUrl</span><span class="o">(</span><span class="n">BASE_URL</span><span class="o">).</span><span class="na">build</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">Flux</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="nf">getEmployeeNames</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">client</span><span class="o">.</span><span class="na">get</span><span class="o">().</span><span class="na">uri</span><span class="o">(</span><span class="s">&#34;/employees&#34;</span><span class="o">).</span><span class="na">accept</span><span class="o">(</span><span class="n">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">                <span class="o">.</span><span class="na">retrieve</span><span class="o">()</span>
+</span></span><span class="line"><span class="cl">                <span class="o">.</span><span class="na">bodyToFlux</span><span class="o">(</span><span class="n">Employee</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">                <span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="n">Employee</span><span class="o">::</span><span class="n">getName</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In the above code, we&rsquo;ve implented some basic logic to get all employee names as a <code>Flux&lt;String&gt;</code>.</p>
+<p>Any caller subscribing to this flux will receive the full list of names upon completion.</p>
+<h3 id="running-the-application">Running the application</h3>
+<p>Let&rsquo;s make our application executable, by creating an <code>Application</code> class that utilises <code>@SpringBootApplication</code> annotation:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nn">uk.scarfe</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.boot.SpringApplication</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.boot.autoconfigure.SpringBootApplication</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.context.ConfigurableApplicationContext</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">uk.scarfe.webflux.annotation.EmployeeClient</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@SpringBootApplication</span>
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Application</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ConfigurableApplicationContext</span> <span class="n">context</span> <span class="o">=</span> <span class="n">SpringApplication</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">Application</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">EmployeeClient</span> <span class="n">client</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">EmployeeClient</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">client</span><span class="o">.</span><span class="na">getEmployeeNames</span><span class="o">().</span><span class="na">subscribe</span><span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">::</span><span class="n">println</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Thanks to Spring Boot&rsquo;s auto-configuration, this is all we need to do. Spring Boot will automatically start our Netty server on port 8080 and perform injection of the relevant dependencies.</p>
+<p>By retrieving the <code>EmployeeClient</code> from the application context and subscribing to the publisher instance, we can retrieve the employee data in a non-blocking manner.</p>
+<p>If you go ahead and run the application you will see our two employee names printed to the console:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">uk.scarfe.Application                    : Started Application in 1.978 seconds <span class="o">(</span>JVM running <span class="k">for</span> 2.435<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Daniel Scarfe
+</span></span><span class="line"><span class="cl">Joe Bloggs
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>There you have it. We have successfully demonstrated how to utilise Spring&rsquo;s annotation-based processing (similar to that of Spring MVC) to produce a reactive web backend in Java.</p>
+<p>Implementing additional PUT / POST / DELETE functionality is as simple as using the corresponding annotations:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="nd">@PostMapping</span>
+</span></span><span class="line"><span class="cl"><span class="nd">@ResponseStatus</span><span class="o">(</span><span class="n">HttpStatus</span><span class="o">.</span><span class="na">CREATED</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="n">Mono</span><span class="o">&lt;</span><span class="n">Employee</span><span class="o">&gt;</span> <span class="nf">create</span><span class="o">(</span><span class="nd">@RequestBody</span> <span class="n">Employee</span> <span class="n">employee</span><span class="o">){</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// As we have not created an &#39;employeeService&#39; yet, this is merely an example.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">return</span> <span class="n">employeeService</span><span class="o">.</span><span class="na">createEmployee</span><span class="o">(</span><span class="n">employee</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Annotation-based processing isn&rsquo;t for everybody. In the next section, we will evaluate the functional approach also supported by WebFlux.</p>
+<h2 id="functional-approach">Functional Approach</h2>
+<p>The &ldquo;Spring Functional Web Framework&rdquo; was designed for Spring WebFlux, but has now also been introduced to Spring MVC.</p>
+<p>Instead of using the annotation-based approach, we can utilise functions for routing &amp; handling our HTTP requests.</p>
+<h3 id="implementing-a-service">Implementing a service</h3>
+<p>To avoid mixing the two approaches, we&rsquo;re going to create a very basic <code>EmployeeService</code> like so:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nn">uk.scarfe.webflux.functional</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">reactor.core.publisher.Mono</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">uk.scarfe.webflux.model.Employee</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">java.util.Optional</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import static</span> <span class="nn">uk.scarfe.webflux.annotation.EmployeeController.EMPLOYEES</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@Component</span>
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">EmployeeService</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">Mono</span><span class="o">&lt;</span><span class="n">Employee</span><span class="o">&gt;</span> <span class="nf">getById</span><span class="o">(</span><span class="kt">long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kd">final</span> <span class="n">Optional</span><span class="o">&lt;</span><span class="n">Employee</span><span class="o">&gt;</span> <span class="n">foundEmployee</span> <span class="o">=</span> <span class="n">EMPLOYEES</span><span class="o">.</span><span class="na">stream</span><span class="o">().</span><span class="na">filter</span><span class="o">(</span><span class="n">e</span> <span class="o">-&gt;</span> <span class="n">e</span><span class="o">.</span><span class="na">getId</span><span class="o">()</span> <span class="o">==</span> <span class="n">id</span><span class="o">).</span><span class="na">findAny</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">foundEmployee</span><span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="n">Mono</span><span class="o">::</span><span class="n">just</span><span class="o">).</span><span class="na">orElseGet</span><span class="o">(</span><span class="n">Mono</span><span class="o">::</span><span class="n">empty</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The only public facing method, <code>getById()</code> shall return a <code>Mono</code> instance containing an employee corresponding to the given ID value, or <code>Mono.empty()</code> if one is not present.</p>
+<h3 id="creating-the-handler">Creating the handler</h3>
+<p>Nowe we create an <code>EmployeeHandler</code> that can accept a <code>ServerRequest</code> and returns a response containing our employee object:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nn">uk.scarfe.webflux.functional</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.http.MediaType</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.web.reactive.function.server.ServerRequest</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.web.reactive.function.server.ServerResponse</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">reactor.core.publisher.Mono</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">uk.scarfe.webflux.model.Employee</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@Component</span>
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">EmployeeHandler</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="kd">final</span> <span class="n">EmployeeService</span> <span class="n">employeeService</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="nf">EmployeeHandler</span><span class="o">(</span><span class="n">EmployeeService</span> <span class="n">employeeService</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">this</span><span class="o">.</span><span class="na">employeeService</span> <span class="o">=</span> <span class="n">employeeService</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">Mono</span><span class="o">&lt;</span><span class="n">ServerResponse</span><span class="o">&gt;</span> <span class="nf">getById</span><span class="o">(</span><span class="n">ServerRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kd">final</span> <span class="kt">long</span> <span class="n">id</span> <span class="o">=</span> <span class="n">Long</span><span class="o">.</span><span class="na">parseLong</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">pathVariable</span><span class="o">(</span><span class="s">&#34;id&#34;</span><span class="o">));</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">employeeService</span>
+</span></span><span class="line"><span class="cl">                <span class="o">.</span><span class="na">getById</span><span class="o">(</span><span class="n">id</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">                <span class="o">.</span><span class="na">flatMap</span><span class="o">(</span><span class="n">e</span> <span class="o">-&gt;</span> <span class="n">ServerResponse</span><span class="o">.</span><span class="na">ok</span><span class="o">()</span>
+</span></span><span class="line"><span class="cl">                        <span class="o">.</span><span class="na">contentType</span><span class="o">(</span><span class="n">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">                        <span class="o">.</span><span class="na">body</span><span class="o">(</span><span class="n">Mono</span><span class="o">.</span><span class="na">just</span><span class="o">(</span><span class="n">e</span><span class="o">),</span> <span class="n">Employee</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">                <span class="o">)</span>
+</span></span><span class="line"><span class="cl">                <span class="o">.</span><span class="na">switchIfEmpty</span><span class="o">(</span><span class="n">ServerResponse</span><span class="o">.</span><span class="na">notFound</span><span class="o">().</span><span class="na">build</span><span class="o">());</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Note the functional style. The &ldquo;id&rdquo; path variable is passed into the <code>.getById()</code> call, and the result is flat-mapped into a <code>ServerResponse</code>.</p>
+<p>The <code>Employee</code> instance that matches our ID value is stored in the body of the response, and a <em>HTTP 200 OK</em> is sent.</p>
+<p>In the event an employee instance corresponding to our ID cannot be verified, the <code>.switchIfEmpty()</code> statement ensures that a <em>HTTP 404 Not Found</em> response is sent instead.</p>
+<h3 id="defining-our-routes">Defining our routes</h3>
+<p>Finally, we create an <code>EmployeeRouter</code> which provides the route configuration for our endpoint mapping:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nn">uk.scarfe.webflux.functional</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.context.annotation.Bean</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.context.annotation.Configuration</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.web.reactive.function.server.RouterFunction</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.web.reactive.function.server.ServerResponse</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import static</span> <span class="nn">org.springframework.web.reactive.function.server.RequestPredicates.GET</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import static</span> <span class="nn">org.springframework.web.reactive.function.server.RouterFunctions.route</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@Configuration</span>
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">EmployeeRouter</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nd">@Bean</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">RouterFunction</span><span class="o">&lt;</span><span class="n">ServerResponse</span><span class="o">&gt;</span> <span class="nf">employees</span><span class="o">(</span><span class="n">EmployeeHandler</span> <span class="n">employeeHandler</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">route</span><span class="o">(</span><span class="n">GET</span><span class="o">(</span><span class="s">&#34;/employees/{id}&#34;</span><span class="o">),</span> <span class="n">employeeHandler</span><span class="o">::</span><span class="n">getById</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Here we can see that we have mapped a GET endpoint at <em>&quot;/employees/{id}&quot;</em> and delegated to the <code>.getById()</code> function in <code>EmployeeHandler</code>.</p>
+<p>The class is annotated with <code>@Configuration</code> so Spring will construct our <code>RouterFunction</code> bean &amp; automatically configure our Netty server accordingly.</p>
+<h2 id="automated-testing">Automated Testing</h2>
+<p>Whilst manual testing has it&rsquo;s place in software development, all good projects will have proper automated testing, and this is no exception.</p>
+<p>Fortunately, Spring makes the testing of REST APIs very easy. Let&rsquo;s go ahead and add the following dependencies to our <code>pom.xml</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-xml" data-lang="xml"><span class="line"><span class="cl"><span class="nt">&lt;dependency&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;groupId&gt;</span>org.junit.jupiter<span class="nt">&lt;/groupId&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;artifactId&gt;</span>junit-jupiter<span class="nt">&lt;/artifactId&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;version&gt;</span>RELEASE<span class="nt">&lt;/version&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;/dependency&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;dependency&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-test<span class="nt">&lt;/artifactId&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;version&gt;</span>2.7.0<span class="nt">&lt;/version&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="nt">&lt;/dependency&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="validating-a-flux-response">Validating a Flux response</h3>
+<p>Now we can test our endpoints by creating an <code>EmployeeHandlerTest</code> with JUnit 5.</p>
+<p>Let&rsquo;s start by testing the <code>.getAll()</code> method:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kn">package</span> <span class="nn">uk.scarfe.webflux</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.junit.jupiter.api.extension.ExtendWith</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.boot.test.context.SpringBootTest</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.http.MediaType</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.test.context.junit.jupiter.SpringExtension</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">org.springframework.test.web.reactive.server.WebTestClient</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">uk.scarfe.webflux.model.Employee</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import static</span> <span class="nn">org.junit.jupiter.api.Assertions.assertEquals</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import static</span> <span class="nn">uk.scarfe.webflux.annotation.EmployeeController.EMPLOYEES</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@ExtendWith</span><span class="o">(</span><span class="n">SpringExtension</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="nd">@SpringBootTest</span><span class="o">(</span><span class="n">webEnvironment</span> <span class="o">=</span> <span class="n">SpringBootTest</span><span class="o">.</span><span class="na">WebEnvironment</span><span class="o">.</span><span class="na">RANDOM_PORT</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">EmployeeHandlerTest</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Spring Boot will create a pre-configured `WebTestClient` for you.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="nd">@Autowired</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="n">WebTestClient</span> <span class="n">webTestClient</span><span class="o">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nd">@Test</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testGetAll</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">webTestClient</span><span class="o">.</span><span class="na">get</span><span class="o">().</span><span class="na">uri</span><span class="o">(</span><span class="s">&#34;/employees&#34;</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">                <span class="o">.</span><span class="na">accept</span><span class="o">(</span><span class="n">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">                <span class="o">.</span><span class="na">exchange</span><span class="o">()</span>
+</span></span><span class="line"><span class="cl">                <span class="o">.</span><span class="na">expectStatus</span><span class="o">().</span><span class="na">isOk</span><span class="o">()</span>
+</span></span><span class="line"><span class="cl">                <span class="o">.</span><span class="na">expectBodyList</span><span class="o">(</span><span class="n">Employee</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">                <span class="o">.</span><span class="na">isEqualTo</span><span class="o">(</span><span class="n">EMPLOYEES</span><span class="o">);</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Thanks to Spring Boot, the web environment is started on a random available port, and the <code>WebTestClient</code> is automatically configured to test against it.</p>
+<p>We simply inject this into our test suite and then use the functional API to assert that our responses match our desired behaviour.</p>
+<h3 id="validating-a-mono-response">Validating a Mono response</h3>
+<p>We can extend our test suite further, by validating calls to <code>.getById()</code> like so:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="nd">@Test</span>
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">testGetById</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">webTestClient</span><span class="o">.</span><span class="na">get</span><span class="o">().</span><span class="na">uri</span><span class="o">(</span><span class="s">&#34;/employees/1&#34;</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">            <span class="o">.</span><span class="na">accept</span><span class="o">(</span><span class="n">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">            <span class="o">.</span><span class="na">exchange</span><span class="o">()</span>
+</span></span><span class="line"><span class="cl">            <span class="o">.</span><span class="na">expectStatus</span><span class="o">().</span><span class="na">isOk</span><span class="o">()</span>
+</span></span><span class="line"><span class="cl">            <span class="o">.</span><span class="na">expectBody</span><span class="o">(</span><span class="n">Employee</span><span class="o">.</span><span class="na">class</span><span class="o">).</span><span class="na">value</span><span class="o">(</span><span class="n">employee</span> <span class="o">-&gt;</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">assertEquals</span><span class="o">(</span><span class="s">&#34;Daniel Scarfe&#34;</span><span class="o">,</span> <span class="n">employee</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
+</span></span><span class="line"><span class="cl">            <span class="o">});</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Here we make use of <code>.expectBody(...)</code> to validate that the body of the JSON response contains our desired <code>Employee</code> instance.</p>
+<h3 id="validating-error-scenarios">Validating error scenarios</h3>
+<p>Finally, it&rsquo;s always worth testing the various error scenarios, such as when an item cannot be found:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="nd">@Test</span>
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="kt">void</span> <span class="nf">testNotFound</span><span class="o">()</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">webTestClient</span><span class="o">.</span><span class="na">get</span><span class="o">().</span><span class="na">uri</span><span class="o">(</span><span class="s">&#34;/employees/123&#34;</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">            <span class="o">.</span><span class="na">accept</span><span class="o">(</span><span class="n">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">            <span class="o">.</span><span class="na">exchange</span><span class="o">()</span>
+</span></span><span class="line"><span class="cl">            <span class="o">.</span><span class="na">expectStatus</span><span class="o">().</span><span class="na">isNotFound</span><span class="o">();</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In this example, we tell the test client to expect a <em>&ldquo;Not Found&rdquo;</em> response because no employee exists with ID #123.</p>
+<p>Of course, the implementation has both functional &amp; annotation styles, but the testing methodology remains the same.</p>
+<p>This represents a very powerful way of testing APIs; the overall suite takes milliseconds to run, yet can provide complete coverage with minimal effort.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>In this article, we explored how to create &amp; work with the reactive web components supplied by the Spring WebFlux framework.</p>
+<p>As an example, we built a small reactive REST API for retrieving employee data in a non-blocking manner.</p>
+<p>We introduced both the <code>Flux</code> and <code>Mono</code> publisher implementations, available through Project Reactor / JDK 9 onwards.</p>
+<p>Then we learned how to use <code>RestController</code> and <code>WebClient</code> to publish &amp; consume our reactive streams in the JVM.</p>
+<p>We also reviewed the functional approach to creating WebFlux applications, and demonstrated how to test the application in JUnit 5.</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/rest/">rest</a>,&nbsp;<a href="/tags/java/">java</a>,&nbsp;<a href="/tags/spring/">spring</a>,&nbsp;<a href="/tags/reactive/">reactive</a>,&nbsp;<a href="/tags/web/">web</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"></div>
+</div>
+<div id="comments"><div id="valine" class="comment"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://valine.js.org/">Valine</a>.
+            </noscript></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Daniel Scarfe</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/valine/valine.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/valine@1.4.18/dist/Valine.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.13.0/dist/algoliasearch-lite.umd.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{"valine":{"appId":"QGzwQXOqs5JOhN4RGPOkR2mR-MdYXbMMI","appKey":"WBmoGyJtbqUswvfLh6L8iEBr","avatar":"mp","el":"#valine","emojiCDN":"https://cdn.jsdelivr.net/npm/emoji-datasource-google@14.0.0/img/google/64/","emojiMaps":{"100":"1f4af.png","alien":"1f47d.png","anger":"1f4a2.png","angry":"1f620.png","anguished":"1f627.png","astonished":"1f632.png","black_heart":"1f5a4.png","blue_heart":"1f499.png","blush":"1f60a.png","bomb":"1f4a3.png","boom":"1f4a5.png","broken_heart":"1f494.png","brown_heart":"1f90e.png","clown_face":"1f921.png","cold_face":"1f976.png","cold_sweat":"1f630.png","confounded":"1f616.png","confused":"1f615.png","cry":"1f622.png","crying_cat_face":"1f63f.png","cupid":"1f498.png","dash":"1f4a8.png","disappointed":"1f61e.png","disappointed_relieved":"1f625.png","dizzy":"1f4ab.png","dizzy_face":"1f635.png","drooling_face":"1f924.png","exploding_head":"1f92f.png","expressionless":"1f611.png","face_vomiting":"1f92e.png","face_with_cowboy_hat":"1f920.png","face_with_hand_over_mouth":"1f92d.png","face_with_head_bandage":"1f915.png","face_with_monocle":"1f9d0.png","face_with_raised_eyebrow":"1f928.png","face_with_rolling_eyes":"1f644.png","face_with_symbols_on_mouth":"1f92c.png","face_with_thermometer":"1f912.png","fearful":"1f628.png","flushed":"1f633.png","frowning":"1f626.png","ghost":"1f47b.png","gift_heart":"1f49d.png","green_heart":"1f49a.png","grimacing":"1f62c.png","grin":"1f601.png","grinning":"1f600.png","hankey":"1f4a9.png","hear_no_evil":"1f649.png","heart":"2764-fe0f.png","heart_decoration":"1f49f.png","heart_eyes":"1f60d.png","heart_eyes_cat":"1f63b.png","heartbeat":"1f493.png","heartpulse":"1f497.png","heavy_heart_exclamation_mark_ornament":"2763-fe0f.png","hole":"1f573-fe0f.png","hot_face":"1f975.png","hugging_face":"1f917.png","hushed":"1f62f.png","imp":"1f47f.png","innocent":"1f607.png","japanese_goblin":"1f47a.png","japanese_ogre":"1f479.png","joy":"1f602.png","joy_cat":"1f639.png","kiss":"1f48b.png","kissing":"1f617.png","kissing_cat":"1f63d.png","kissing_closed_eyes":"1f61a.png","kissing_heart":"1f618.png","kissing_smiling_eyes":"1f619.png","laughing":"1f606.png","left_speech_bubble":"1f5e8-fe0f.png","love_letter":"1f48c.png","lying_face":"1f925.png","mask":"1f637.png","money_mouth_face":"1f911.png","nauseated_face":"1f922.png","nerd_face":"1f913.png","neutral_face":"1f610.png","no_mouth":"1f636.png","open_mouth":"1f62e.png","orange_heart":"1f9e1.png","partying_face":"1f973.png","pensive":"1f614.png","persevere":"1f623.png","pleading_face":"1f97a.png","pouting_cat":"1f63e.png","purple_heart":"1f49c.png","rage":"1f621.png","relaxed":"263a-fe0f.png","relieved":"1f60c.png","revolving_hearts":"1f49e.png","right_anger_bubble":"1f5ef-fe0f.png","robot_face":"1f916.png","rolling_on_the_floor_laughing":"1f923.png","scream":"1f631.png","scream_cat":"1f640.png","see_no_evil":"1f648.png","shushing_face":"1f92b.png","skull":"1f480.png","skull_and_crossbones":"2620-fe0f.png","sleeping":"1f634.png","sleepy":"1f62a.png","slightly_frowning_face":"1f641.png","slightly_smiling_face":"1f642.png","smile":"1f604.png","smile_cat":"1f638.png","smiley":"1f603.png","smiley_cat":"1f63a.png","smiling_face_with_3_hearts":"1f970.png","smiling_imp":"1f608.png","smirk":"1f60f.png","smirk_cat":"1f63c.png","sneezing_face":"1f927.png","sob":"1f62d.png","space_invader":"1f47e.png","sparkling_heart":"1f496.png","speak_no_evil":"1f64a.png","speech_balloon":"1f4ac.png","star-struck":"1f929.png","stuck_out_tongue":"1f61b.png","stuck_out_tongue_closed_eyes":"1f61d.png","stuck_out_tongue_winking_eye":"1f61c.png","sunglasses":"1f60e.png","sweat":"1f613.png","sweat_drops":"1f4a6.png","sweat_smile":"1f605.png","thinking_face":"1f914.png","thought_balloon":"1f4ad.png","tired_face":"1f62b.png","triumph":"1f624.png","two_hearts":"1f495.png","unamused":"1f612.png","upside_down_face":"1f643.png","weary":"1f629.png","white_frowning_face":"2639-fe0f.png","white_heart":"1f90d.png","wink":"1f609.png","woozy_face":"1f974.png","worried":"1f61f.png","yawning_face":"1f971.png","yellow_heart":"1f49b.png","yum":"1f60b.png","zany_face":"1f92a.png","zipper_mouth_face":"1f910.png","zzz":"1f4a4.png"},"enableQQ":false,"highlight":true,"lang":"en","pageSize":10,"placeholder":"Your comment ...","recordIP":true,"serverURLs":"https://leancloud.hugoloveit.com","visitor":true}},"search":{"algoliaAppID":"","algoliaIndex":"","algoliaSearchKey":"","highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"algolia"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

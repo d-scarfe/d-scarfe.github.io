@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Building a REST API with Scala &amp; Play | Daniel Scarfe</title><meta name="Description" content="Hugo theme - LoveIt"><meta property="og:title" content="Building a REST API with Scala &amp; Play" />
+<meta property="og:description" content="In this article, we&rsquo;re going to build a simple REST API in Scala using the Play Framework.
+We shall utilise HTTP requests to perform basic CRUD operations on an example dataset.
+We&rsquo;ll demonstrate (in Scala) how we can serve our content back to the user in the JSON format.
+This tutorial shall provide the basis from which we can build efficient, scalable backend systems.
+Introducing the Play Framework Why choose Play?" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://scarfe.uk/scala/play-framework/" /><meta property="og:image" content="https://scarfe.uk/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-05-29T06:00:00+01:00" />
+<meta property="article:modified_time" content="2022-05-29T06:00:00+01:00" /><meta property="og:site_name" content="scarfe.uk" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://scarfe.uk/logo.png"/>
+
+<meta name="twitter:title" content="Building a REST API with Scala &amp; Play"/>
+<meta name="twitter:description" content="In this article, we&rsquo;re going to build a simple REST API in Scala using the Play Framework.
+We shall utilise HTTP requests to perform basic CRUD operations on an example dataset.
+We&rsquo;ll demonstrate (in Scala) how we can serve our content back to the user in the JSON format.
+This tutorial shall provide the basis from which we can build efficient, scalable backend systems.
+Introducing the Play Framework Why choose Play?"/>
+<meta name="application-name" content="scarfe.uk">
+<meta name="apple-mobile-web-app-title" content="scarfe.uk"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://scarfe.uk/scala/play-framework/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Building a REST API with Scala \u0026 Play",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/scarfe.uk\/scala\/play-framework\/"
+        },"image": ["https:\/\/scarfe.uk\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "rest, scala, play, reactive, web","wordcount":  2147 ,
+        "url": "https:\/\/scarfe.uk\/scala\/play-framework\/","datePublished": "2022-05-29T06:00:00+01:00","dateModified": "2022-05-29T06:00:00+01:00","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "https:\/\/scarfe.uk\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "Daniel Scarfe"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('light' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'light' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Daniel Scarfe">scarfe.uk</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/categories/java/"> Java </a><a class="menu-item" href="/categories/scala/"> Scala </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Daniel Scarfe">scarfe.uk</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/categories/java/" title="">Java</a><a class="menu-item" href="/categories/scala/" title="">Scala</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Building a REST API with Scala & Play</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-category"><a href="/categories/scala/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>scala</a>&nbsp;|&nbsp;
+                    </span><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-05-29">2022-05-29</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2147 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;11 minutes&nbsp;
+                <span style="float: right"><i>Last updated on 2022-05-29</i></span>
+            </div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#introducing-the-play-framework">Introducing the Play Framework</a>
+      <ul>
+        <li><a href="#why-choose-play">Why choose Play?</a></li>
+        <li><a href="#who-is-using-play">Who is using Play?</a></li>
+      </ul>
+    </li>
+    <li><a href="#our-mission">Our Mission</a>
+      <ul>
+        <li><a href="#what-are-we-making">What are we making?</a></li>
+        <li><a href="#what-do-i-need">What do I need?</a></li>
+      </ul>
+    </li>
+    <li><a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#initial-setup">Initial setup</a></li>
+        <li><a href="#project-structure">Project structure</a></li>
+      </ul>
+    </li>
+    <li><a href="#our-first-get-endpoint">Our First GET Endpoint</a>
+      <ul>
+        <li><a href="#creating-a-controller">Creating a controller</a></li>
+        <li><a href="#our-response-function">Our response function</a></li>
+        <li><a href="#enabling-the-endpoint">Enabling the endpoint</a></li>
+        <li><a href="#running-the-application">Running the application</a></li>
+      </ul>
+    </li>
+    <li><a href="#returning-json-content">Returning JSON Content</a>
+      <ul>
+        <li><a href="#defining-the-data-model">Defining the data model</a></li>
+        <li><a href="#formatting-into-json">Formatting into JSON</a></li>
+        <li><a href="#implementing-our-response">Implementing our response</a></li>
+        <li><a href="#handling-parameterised-calls">Handling parameterised calls</a></li>
+      </ul>
+    </li>
+    <li><a href="#implementing-post">Implementing POST</a></li>
+    <li><a href="#implementing-delete">Implementing DELETE</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>In this article, we&rsquo;re going to build a simple REST API in Scala using the Play Framework.</p>
+<p>We shall utilise HTTP requests to perform basic CRUD operations on an example dataset.</p>
+<p>We&rsquo;ll demonstrate (in Scala) how we can serve our content back to the user in the JSON format.</p>
+<p>This tutorial shall provide the basis from which we can build efficient, scalable backend systems.</p>
+<h2 id="introducing-the-play-framework">Introducing the Play Framework</h2>
+<h3 id="why-choose-play">Why choose Play?</h3>
+<p>The Play Framework encourages scalability whilst managing to remain simple to use. It remains true to the MVC paradigm, but builds upon reactive principles, meaning that the concept feels familiar but the resulting product is highly performant. For me personally, the biggest advantage of the Play Framework is performance. Play&rsquo;s threading model means that it is both fast &amp; resource efficient.</p>
+<p>This is in contrast to the more traditional approach to MVC, such as Spring&rsquo;s implementation in Java, whereby a single thread is created for each request. Whilst this approach is easy to debug &amp; understand, each thread typically utilises 1MB of heap to service the request. When faced with many concurrent users, this approach can present a number of scaling issues.</p>
+<h3 id="who-is-using-play">Who is using Play?</h3>
+<p>Some key players using the Play Framework in industry include <em>LinkedIn</em> and <em>Walmart</em>. Both of these large organisations handle millions of requests daily, which demonstrates the power &amp; scalability of the framework. Since its initial release in 2007, Play has become a much loved web framework for the Java &amp; Scala community.</p>
+<h2 id="our-mission">Our Mission</h2>
+<h3 id="what-are-we-making">What are we making?</h3>
+<p>In the following example, we&rsquo;ll build a very simple REST API which provides a number of endpoints capable of responding to HTTP requests.</p>
+<p>We will start by implementing a simple GET endpoint, and then we will add support for POST &amp; DELETE requests.</p>
+<p>We shall test the API by performing some basic CRUD operations to manipulate an example in-memory dataset.</p>
+<h3 id="what-do-i-need">What do I need?</h3>
+<p>This article assumes that the reader has already installed a recent version of <code>sbt</code>.</p>
+<p>We will peform basic API testing using <code>curl</code> on the command line.</p>
+<p>Some readers may prefer to use a graphical testing tool, such as <a href="https://www.postman.com/" target="_blank" rel="noopener noreffer">Postman</a>.</p>
+<h2 id="getting-started">Getting Started</h2>
+<h3 id="initial-setup">Initial setup</h3>
+<p>For convenience, we can start our new Play Framework project using an <code>sbt</code> template:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ sbt new playframework/play-scala-seed.g8
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This creates a new Scala project with an example controller, two HTML files and basic configuration.</p>
+<p>Let&rsquo;s go ahead and delete some of these components so that we have a &ldquo;clean slate&rdquo; to work from:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ rm -rf app/controllers/HomeController.scala 
+</span></span><span class="line"><span class="cl">$ rm -rf app/views/index.scala.html app/views/main.scala.html
+</span></span><span class="line"><span class="cl">$ truncate -s 0 conf/routes
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="project-structure">Project structure</h3>
+<p>Now we can take a look at the various directories in a little more detail:</p>
+<ul>
+<li><code>app/controllers/</code> shall contain our Scala classes used to handle the HTTP events.</li>
+<li><code>app/models/</code> shall contain our data objects, in the form of Scala classes.</li>
+<li><code>app/views/</code> shall contain any HTML template files (not used in this tutorial).</li>
+<li><code>conf/</code> shall contain the configuration used to wire everything together.</li>
+</ul>
+<p>Note the familiarity of the package names above; <em>Model</em>, <em>View</em>, <em>Controller</em> (MVC).</p>
+<h2 id="our-first-get-endpoint">Our First GET Endpoint</h2>
+<p>We begin by creating a simple REST endpoint that responds to <em>HTTP GET</em> requests and provides a <em>NoContent</em> response. This is arguably the most simple endpoint we can make, but it is useful in helping to demonstrate the classes involved.</p>
+<h3 id="creating-a-controller">Creating a controller</h3>
+<p>First, we create an <code>EmployeeController</code> class in the <code>app/controllers</code> directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">package</span> <span class="nn">controllers</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">javax.inject.Singleton</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">com.google.inject.Inject</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">play.api.mvc.</span><span class="o">{</span><span class="nc">Action</span><span class="o">,</span> <span class="nc">AnyContent</span><span class="o">,</span> <span class="nc">BaseController</span><span class="o">,</span> <span class="nc">ControllerComponents</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@Singleton</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">EmployeeController</span> <span class="nd">@Inject</span><span class="o">()(</span><span class="k">val</span> <span class="n">controllerComponents</span><span class="k">:</span> <span class="kt">ControllerComponents</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">  <span class="k">extends</span> <span class="nc">BaseController</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Business logic goes here!
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Our new class must extend the <code>BaseController</code> trait, which gives us access to <code>Action</code> and <code>Results</code> functionality.</p>
+<p>We’ve used the <code>@Inject</code> annotation to instruct the Play Framework to pass the required dependencies automatically via constructor injection.</p>
+<p>Also, we marked the class as a <code>@Singleton</code> so that the framework will create only one instance, reusing it for every request.</p>
+<h3 id="our-response-function">Our response function</h3>
+<p>Now we have a <code>EmployeeController</code>, let’s create the method within that will be called when our server receives a REST request.</p>
+<p>First, we define a <em>getAll</em> function that returns an aforementioned <code>Action</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">def</span> <span class="n">getAll</span><span class="o">()</span><span class="k">:</span> <span class="kt">Action</span><span class="o">[</span><span class="kt">AnyContent</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Action</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nc">NoContent</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The <code>Action</code> class gives us access to request parameters and allows us to return a HTTP response.</p>
+<p>For now, we simply return a <em>NoContent</em> status, because we have no content to return.</p>
+<h3 id="enabling-the-endpoint">Enabling the endpoint</h3>
+<p>Before we create our content, let&rsquo;s add the controller to the routes file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">GET    /employees                  controllers.EmployeeController.getAll()
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We must specify the HTTP method, the path, and the name of the Scala function that handles the request.</p>
+<p>The only separater here is whitespace, but we format it into columns for readability.</p>
+<h3 id="running-the-application">Running the application</h3>
+<p>Now we have enabled our endpoint, we can go ahead and start the application:</p>
+<p><code>$ sbt run 9000</code></p>
+<p>After a short while, we’ll see the following message:</p>
+<p><code>[info] p.c.s.AkkaHttpServer - Listening for HTTP on /0:0:0:0:0:0:0:0:9000</code></p>
+<p>This indicates that the application has started &amp; is ready to handle requests.</p>
+<p>Let&rsquo;s make our first HTTP GET call using <code>curl</code> like so:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">$ curl -v localhost:9000/employees
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>You will be greeted with a <code>HTTP/1.1 204 No Content</code> response.</p>
+<p>Et voilà! We now have a working RESTful API using Scala &amp; the Play Framework.</p>
+<p>Granted, it is a little basic, so let&rsquo;s continue to add some more functionality.</p>
+<h2 id="returning-json-content">Returning JSON Content</h2>
+<p>So far we have returned only a <em>NoContent</em> response. That suffices for proving we can build a running Play application, but you aren&rsquo;t going to build an enterpise backend on that.</p>
+<p>At the very least, we need to be able to return some meaningful content. Let&rsquo;s produce some.</p>
+<p>Now, we are going to look at returning an <code>Employee</code> list. Let’s define the data model, create an in-memory collection of employees, and modify the <code>EmployeeController</code> to return JSON objects.</p>
+<h3 id="defining-the-data-model">Defining the data model</h3>
+<p>First, we create a new case class in the <code>app/models</code> directory:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">package</span> <span class="nn">model</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">case</span> <span class="k">class</span> <span class="nc">Employee</span><span class="o">(</span><span class="n">id</span><span class="k">:</span> <span class="kt">Long</span><span class="o">,</span> <span class="n">name</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now, we define the list of tasks in the <code>EmployeeController</code> class.</p>
+<p>As this list will be modified, we need Scala&rsquo;s mutable collections package:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="o">...</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">model.Employee</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">scala.collection.mutable</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">EmployeeController</span> <span class="nd">@Inject</span><span class="o">()(</span><span class="k">val</span> <span class="n">controllerComponents</span><span class="k">:</span> <span class="kt">ControllerComponents</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">  <span class="k">extends</span> <span class="nc">BaseController</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="k">val</span> <span class="n">employeeList</span> <span class="k">=</span> <span class="k">new</span> <span class="n">mutable</span><span class="o">.</span><span class="nc">ListBuffer</span><span class="o">[</span><span class="kt">Employee</span><span class="o">]()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">employeeList</span> <span class="o">+=</span> <span class="nc">Employee</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">&#34;Daniel Scarfe&#34;</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">employeeList</span> <span class="o">+=</span> <span class="nc">Employee</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">&#34;Joe Bloggs&#34;</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">    <span class="o">...</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>To make testing our application easier, we&rsquo;ve hardcoded a number of values here, but in practice you would likely retrieve this information from a data store.</p>
+<h3 id="formatting-into-json">Formatting into JSON</h3>
+<p>Next, let’s create the JSON formatter that converts the <code>Employee</code> object into JSON.</p>
+<p>We add our required imports, then create the JSON formatter inside the <code>EmployeeController</code> class:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="o">...</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">play.api.libs.json.</span><span class="o">{</span><span class="nc">Json</span><span class="o">,</span> <span class="nc">OFormat</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@Singleton</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">EmployeeController</span> <span class="nd">@Inject</span><span class="o">()(</span><span class="k">val</span> <span class="n">controllerComponents</span><span class="k">:</span> <span class="kt">ControllerComponents</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">  <span class="k">extends</span> <span class="nc">BaseController</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">implicit</span> <span class="k">val</span> <span class="n">formatter</span><span class="k">:</span> <span class="kt">OFormat</span><span class="o">[</span><span class="kt">Employee</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Json</span><span class="o">.</span><span class="n">format</span><span class="o">[</span><span class="kt">Employee</span><span class="o">]</span>
+</span></span><span class="line"><span class="cl">  <span class="o">...</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We make it an implicit field to avoid having to pass it to the Json.toJson function on each usage.</p>
+<h3 id="implementing-our-response">Implementing our response</h3>
+<p>Now we have some data to return, let’s change our <em>getAll</em> function to return the <em>NoContent</em> status code only when the list is empty.</p>
+<p>Otherwise, it shall return the complete employee list, converted to JSON by the formatter:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">def</span> <span class="n">getAll</span><span class="o">()</span><span class="k">:</span> <span class="kt">Action</span><span class="o">[</span><span class="kt">AnyContent</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Action</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="o">(</span><span class="n">employeeList</span><span class="o">.</span><span class="n">isEmpty</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nc">NoContent</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nc">Ok</span><span class="o">(</span><span class="nc">Json</span><span class="o">.</span><span class="n">toJson</span><span class="o">(</span><span class="n">employeeList</span><span class="o">))</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Let’s re-test the endpoint using the same statement as before:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ curl localhost:9000/employees
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[{</span><span class="s2">&#34;id&#34;</span>: 1, <span class="s2">&#34;name&#34;</span>: <span class="s2">&#34;Daniel Scarfe&#34;</span><span class="o">}</span>,<span class="o">{</span><span class="s2">&#34;id&#34;</span>: 2, <span class="s2">&#34;name&#34;</span>: <span class="s2">&#34;Joe Bloggs&#34;</span><span class="o">}]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>We have successfully returned a list of employees in JSON format.</p>
+<h3 id="handling-parameterised-calls">Handling parameterised calls</h3>
+<p>A good REST API shall also allow you to retrieve individual items via a path parameter like so:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ curl localhost:9000/employees/1
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This shall return the item, or <em>NotFound</em> if the employee ID is not recognised.</p>
+<p>Let&rsquo;s implement that. First, we define a new endpoint in the routes file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">GET    /employees/:id              controllers.EmployeeController.getById(id: Long)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The notation <em>/employees/:id</em> means that the Play Framework shall capture everything after the <em>/employee/</em> prefix and assign it to the <em>id</em> variable. This value is then passed into the <em>getById</em> function, which we haven&rsquo;t written yet.</p>
+<p>Note that we have specified a type for the parameter (<em>Long</em>). The Play Framework will automatically convert text to a number, and return a <em>BadRequest</em> response if the provided value is not a number.</p>
+<p>We can now add the <em>getById</em> method in the <code>EmployeeController</code> class:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">def</span> <span class="n">getById</span><span class="o">(</span><span class="n">id</span><span class="k">:</span> <span class="kt">Long</span><span class="o">)</span><span class="k">:</span> <span class="kt">Action</span><span class="o">[</span><span class="kt">AnyContent</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Action</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">val</span> <span class="n">foundEmployee</span> <span class="k">=</span> <span class="n">employeeList</span><span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">id</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">foundEmployee</span> <span class="k">match</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">employee</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Ok</span><span class="o">(</span><span class="nc">Json</span><span class="o">.</span><span class="n">toJson</span><span class="o">(</span><span class="n">employee</span><span class="o">))</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="nc">None</span> <span class="k">=&gt;</span> <span class="nc">NotFound</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Our method retrieves the <em>id</em> parameter and tries to find the employee list item associated with it.</p>
+<p>We’re using the find function, which returns an instance of the <code>Option</code> class. As such, we can make use of pattern matching to distinguish between an empty <code>Option</code> and an <code>Option</code> with a value, as seen above.</p>
+<p>When the employee is present in the employee list, it’s converted into JSON returned in an <em>OK</em> response. Otherwise, <em>NotFound</em> is returned, resulting in HTTP 404.</p>
+<p>Now, we can try to get an employee that is in our list:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ curl localhost:9000/employees/1
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;id&#34;</span>:1,<span class="s2">&#34;name&#34;</span>:<span class="s2">&#34;Daniel Scarfe&#34;</span><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Or perhaps try an employee that isn’t:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ curl -v localhost:9000/employees/3
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">HTTP/1.1 <span class="m">404</span> Not Found
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="implementing-post">Implementing POST</h2>
+<p>The Play Framework handles all HTTP methods, so when we want to use PUT / POST / DELETE, we simply configure it in the routes file.</p>
+<p>As an example, let&rsquo;s implement an POST endpoint that allows us to create a new employee. We shall start by adding another entry in our routes file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">POST   /employees                  controllers.EmployeeController.addNewEmployee()
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then, as before, we simply add the business logic into the <code>EmployeeController</code> class:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">def</span> <span class="n">addNewEmployee</span><span class="o">()</span><span class="k">:</span> <span class="kt">Action</span><span class="o">[</span><span class="kt">AnyContent</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Action</span> <span class="o">{</span> <span class="k">implicit</span> <span class="n">request</span> <span class="k">=&gt;</span> 
+</span></span><span class="line"><span class="cl">  <span class="c1">// Extract the JSON object from the request body.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">val</span> <span class="n">body</span><span class="k">:</span> <span class="kt">AnyContent</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">body</span>
+</span></span><span class="line"><span class="cl">  <span class="k">val</span> <span class="n">jsonBody</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">JsValue</span><span class="o">]</span> <span class="k">=</span> <span class="n">body</span><span class="o">.</span><span class="n">asJson</span>
+</span></span><span class="line"><span class="cl">  <span class="k">val</span> <span class="n">newEmployee</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">Employee</span><span class="o">]</span> <span class="k">=</span>
+</span></span><span class="line"><span class="cl">    <span class="n">jsonBody</span><span class="o">.</span><span class="n">flatMap</span><span class="o">(</span><span class="n">js</span> <span class="k">=&gt;</span> <span class="nc">Json</span><span class="o">.</span><span class="n">fromJson</span><span class="o">[</span><span class="kt">Employee</span><span class="o">](</span><span class="n">js</span><span class="o">).</span><span class="n">asOpt</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">  <span class="c1">// If present &amp; valid, add to list and return a Created response.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">newEmployee</span> <span class="k">match</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">employee</span><span class="o">)</span> <span class="k">=&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">employeeList</span><span class="o">.</span><span class="n">addOne</span><span class="o">(</span><span class="n">employee</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">      <span class="nc">Created</span><span class="o">(</span><span class="nc">Json</span><span class="o">.</span><span class="n">toJson</span><span class="o">(</span><span class="n">employee</span><span class="o">))</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="nc">None</span> <span class="k">=&gt;</span> <span class="nc">BadRequest</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In our method, <em>body.asJson</em> parses the given JSON object and returns an <code>Option</code>. We would get a valid object only if the deserialisation were successful.</p>
+<p>If the caller has sent us content that cannot be deserialised as an <code>Employee</code>, or if the Content-Type is not <em>application/json</em>, we end up with a <code>None</code> type and a <em>BadRequest</em> response is sent.</p>
+<p>Otherwise, our new <code>Employee</code> instance is added to our <em>employeeList</em>, and a <em>HTTP 201 Created</em> response is returned to the client.</p>
+<p>We can now try to add a new employee using the API like so:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ curl -d <span class="s1">&#39;{&#34;id&#34;:3,&#34;name&#34;:&#34;James Blunt&#34;}&#39;</span> -H <span class="s1">&#39;Content-Type: application/json&#39;</span> localhost:9000/employees
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">HTTP/1.1 <span class="m">201</span> Created.
+</span></span><span class="line"><span class="cl"><span class="o">{</span><span class="s2">&#34;id&#34;</span>: 3,<span class="s2">&#34;name&#34;</span>: <span class="s2">&#34;James Blunt&#34;</span><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>As we can see from our <em>201 Created</em> response, the new item has been added and subsequently returned in the response body.</p>
+<p>To verify that the item was added to our in-memory data store, we can retrieve all items again:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ curl localhost:9000/employees
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>
+</span></span><span class="line"><span class="cl">  <span class="o">{</span><span class="s2">&#34;id&#34;</span>: 1, <span class="s2">&#34;name&#34;</span>: <span class="s2">&#34;Daniel Scarfe&#34;</span><span class="o">}</span>,
+</span></span><span class="line"><span class="cl">  <span class="o">{</span><span class="s2">&#34;id&#34;</span>: 2, <span class="s2">&#34;name&#34;</span>: <span class="s2">&#34;Joe Bloggs&#34;</span><span class="o">}</span>,
+</span></span><span class="line"><span class="cl">  <span class="o">{</span><span class="s2">&#34;id&#34;</span>: 3, <span class="s2">&#34;name&#34;</span>: <span class="s2">&#34;James Blunt&#34;</span><span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>This time, the JSON array shall contain three objects, including our new employee instance.</p>
+<h2 id="implementing-delete">Implementing DELETE</h2>
+<p>Finally, let&rsquo;s add support for deleting items from the list using a HTTP DELETE request.</p>
+<p>As before, we add our business logic to the <code>EmployeeController</code> class:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">def</span> <span class="n">deleteById</span><span class="o">(</span><span class="n">id</span><span class="k">:</span> <span class="kt">Long</span><span class="o">)</span><span class="k">:</span> <span class="kt">Action</span><span class="o">[</span><span class="kt">AnyContent</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Action</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">val</span> <span class="n">foundEmployee</span> <span class="k">=</span> <span class="n">employeeList</span><span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">id</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">foundEmployee</span> <span class="k">match</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">employee</span><span class="o">)</span> <span class="k">=&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="n">employeeList</span> <span class="o">-=</span> <span class="n">employee</span>
+</span></span><span class="line"><span class="cl">      <span class="nc">Ok</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="nc">None</span> <span class="k">=&gt;</span> <span class="nc">NotFound</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Then we configure the route:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">DELETE /employees/:id              controllers.EmployeeController.deleteById(id: Long)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>And we test our endpoint using <code>curl</code> like so:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ curl -v -X DELETE localhost:9000/employees/3
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">HTTP/1.1 <span class="m">200</span> OK.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Note here that we have chosen to simply return an <em>OK</em> response with no body, for simplicity.</p>
+<p>We perform one final validation to make sure that the item has been removed from the list:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ curl localhost:9000/employees
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[{</span><span class="s2">&#34;id&#34;</span>: 1, <span class="s2">&#34;name&#34;</span>: <span class="s2">&#34;Daniel Scarfe&#34;</span><span class="o">}</span>,<span class="o">{</span><span class="s2">&#34;id&#34;</span>: 2, <span class="s2">&#34;name&#34;</span>: <span class="s2">&#34;Joe Bloggs&#34;</span><span class="o">}]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>A second attempt will result in a <em>&ldquo;HTTP 404 Not Found&rdquo;</em> response, because the item no longer exists.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>And there we have it, we have successfully implemented a RESTful API in Scala with the Play Framework!</p>
+<p>We initialised the project and defined our first route and Scala controller class. Then we demonstrated how to marshal JSON to/from Scala objects.</p>
+<p>We showcased support for <code>GET</code>, <code>POST</code> &amp; <code>DELETE</code> requests using the Play Framework to delegate to corresponding Scala functions.</p>
+<p>We also looked at how to use <code>curl</code> to validate the behaviour of our code.</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/rest/">rest</a>,&nbsp;<a href="/tags/scala/">scala</a>,&nbsp;<a href="/tags/play/">play</a>,&nbsp;<a href="/tags/reactive/">reactive</a>,&nbsp;<a href="/tags/web/">web</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"></div>
+</div>
+<div id="comments"><div id="valine" class="comment"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://valine.js.org/">Valine</a>.
+            </noscript></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Daniel Scarfe</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="/lib/valine/valine.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/valine@1.4.18/dist/Valine.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.13.0/dist/algoliasearch-lite.umd.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{"valine":{"appId":"QGzwQXOqs5JOhN4RGPOkR2mR-MdYXbMMI","appKey":"WBmoGyJtbqUswvfLh6L8iEBr","avatar":"mp","el":"#valine","emojiCDN":"https://cdn.jsdelivr.net/npm/emoji-datasource-google@14.0.0/img/google/64/","emojiMaps":{"100":"1f4af.png","alien":"1f47d.png","anger":"1f4a2.png","angry":"1f620.png","anguished":"1f627.png","astonished":"1f632.png","black_heart":"1f5a4.png","blue_heart":"1f499.png","blush":"1f60a.png","bomb":"1f4a3.png","boom":"1f4a5.png","broken_heart":"1f494.png","brown_heart":"1f90e.png","clown_face":"1f921.png","cold_face":"1f976.png","cold_sweat":"1f630.png","confounded":"1f616.png","confused":"1f615.png","cry":"1f622.png","crying_cat_face":"1f63f.png","cupid":"1f498.png","dash":"1f4a8.png","disappointed":"1f61e.png","disappointed_relieved":"1f625.png","dizzy":"1f4ab.png","dizzy_face":"1f635.png","drooling_face":"1f924.png","exploding_head":"1f92f.png","expressionless":"1f611.png","face_vomiting":"1f92e.png","face_with_cowboy_hat":"1f920.png","face_with_hand_over_mouth":"1f92d.png","face_with_head_bandage":"1f915.png","face_with_monocle":"1f9d0.png","face_with_raised_eyebrow":"1f928.png","face_with_rolling_eyes":"1f644.png","face_with_symbols_on_mouth":"1f92c.png","face_with_thermometer":"1f912.png","fearful":"1f628.png","flushed":"1f633.png","frowning":"1f626.png","ghost":"1f47b.png","gift_heart":"1f49d.png","green_heart":"1f49a.png","grimacing":"1f62c.png","grin":"1f601.png","grinning":"1f600.png","hankey":"1f4a9.png","hear_no_evil":"1f649.png","heart":"2764-fe0f.png","heart_decoration":"1f49f.png","heart_eyes":"1f60d.png","heart_eyes_cat":"1f63b.png","heartbeat":"1f493.png","heartpulse":"1f497.png","heavy_heart_exclamation_mark_ornament":"2763-fe0f.png","hole":"1f573-fe0f.png","hot_face":"1f975.png","hugging_face":"1f917.png","hushed":"1f62f.png","imp":"1f47f.png","innocent":"1f607.png","japanese_goblin":"1f47a.png","japanese_ogre":"1f479.png","joy":"1f602.png","joy_cat":"1f639.png","kiss":"1f48b.png","kissing":"1f617.png","kissing_cat":"1f63d.png","kissing_closed_eyes":"1f61a.png","kissing_heart":"1f618.png","kissing_smiling_eyes":"1f619.png","laughing":"1f606.png","left_speech_bubble":"1f5e8-fe0f.png","love_letter":"1f48c.png","lying_face":"1f925.png","mask":"1f637.png","money_mouth_face":"1f911.png","nauseated_face":"1f922.png","nerd_face":"1f913.png","neutral_face":"1f610.png","no_mouth":"1f636.png","open_mouth":"1f62e.png","orange_heart":"1f9e1.png","partying_face":"1f973.png","pensive":"1f614.png","persevere":"1f623.png","pleading_face":"1f97a.png","pouting_cat":"1f63e.png","purple_heart":"1f49c.png","rage":"1f621.png","relaxed":"263a-fe0f.png","relieved":"1f60c.png","revolving_hearts":"1f49e.png","right_anger_bubble":"1f5ef-fe0f.png","robot_face":"1f916.png","rolling_on_the_floor_laughing":"1f923.png","scream":"1f631.png","scream_cat":"1f640.png","see_no_evil":"1f648.png","shushing_face":"1f92b.png","skull":"1f480.png","skull_and_crossbones":"2620-fe0f.png","sleeping":"1f634.png","sleepy":"1f62a.png","slightly_frowning_face":"1f641.png","slightly_smiling_face":"1f642.png","smile":"1f604.png","smile_cat":"1f638.png","smiley":"1f603.png","smiley_cat":"1f63a.png","smiling_face_with_3_hearts":"1f970.png","smiling_imp":"1f608.png","smirk":"1f60f.png","smirk_cat":"1f63c.png","sneezing_face":"1f927.png","sob":"1f62d.png","space_invader":"1f47e.png","sparkling_heart":"1f496.png","speak_no_evil":"1f64a.png","speech_balloon":"1f4ac.png","star-struck":"1f929.png","stuck_out_tongue":"1f61b.png","stuck_out_tongue_closed_eyes":"1f61d.png","stuck_out_tongue_winking_eye":"1f61c.png","sunglasses":"1f60e.png","sweat":"1f613.png","sweat_drops":"1f4a6.png","sweat_smile":"1f605.png","thinking_face":"1f914.png","thought_balloon":"1f4ad.png","tired_face":"1f62b.png","triumph":"1f624.png","two_hearts":"1f495.png","unamused":"1f612.png","upside_down_face":"1f643.png","weary":"1f629.png","white_frowning_face":"2639-fe0f.png","white_heart":"1f90d.png","wink":"1f609.png","woozy_face":"1f974.png","worried":"1f61f.png","yawning_face":"1f971.png","yellow_heart":"1f49b.png","yum":"1f60b.png","zany_face":"1f92a.png","zipper_mouth_face":"1f910.png","zzz":"1f4a4.png"},"enableQQ":false,"highlight":true,"lang":"en","pageSize":10,"placeholder":"Your comment ...","recordIP":true,"serverURLs":"https://leancloud.hugoloveit.com","visitor":true}},"search":{"algoliaAppID":"","algoliaIndex":"","algoliaSearchKey":"","highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"algolia"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

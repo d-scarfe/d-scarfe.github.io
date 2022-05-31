@@ -1,0 +1,19 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>scala - Category | Daniel Scarfe</title>
+        <link>https://scarfe.uk/categories/scala/</link>
+        <description>scala - Category | Daniel Scarfe</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 29 May 2022 06:00:00 &#43;0100</lastBuildDate><atom:link href="https://scarfe.uk/categories/scala/" rel="self" type="application/rss+xml" /><item>
+    <title>Building a REST API with Scala &amp; Play</title>
+    <link>https://scarfe.uk/scala/play-framework/</link>
+    <pubDate>Sun, 29 May 2022 06:00:00 &#43;0100</pubDate>
+    <author>Daniel Scarfe</author>
+    <guid>https://scarfe.uk/scala/play-framework/</guid>
+    <description><![CDATA[In this article, we&rsquo;re going to build a simple REST API in Scala using the Play Framework.
+We shall utilise HTTP requests to perform basic CRUD operations on an example dataset.
+We&rsquo;ll demonstrate (in Scala) how we can serve our content back to the user in the JSON format.
+This tutorial shall provide the basis from which we can build efficient, scalable backend systems.
+Introducing the Play Framework Why choose Play?]]></description>
+</item>
+</channel>
+</rss>

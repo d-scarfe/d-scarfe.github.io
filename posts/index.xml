@@ -1,0 +1,23 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>All Posts | Daniel Scarfe</title>
+        <link>https://scarfe.uk/posts/</link>
+        <description>All Posts | Daniel Scarfe</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 30 May 2022 06:00:00 &#43;0100</lastBuildDate><atom:link href="https://scarfe.uk/posts/" rel="self" type="application/rss+xml" /><item>
+    <title></title>
+    <link>https://scarfe.uk/posts/java/</link>
+    <pubDate>Mon, 30 May 2022 06:00:00 &#43;0100</pubDate>
+    <author>Daniel Scarfe</author>
+    <guid>https://scarfe.uk/posts/java/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
+    <title></title>
+    <link>https://scarfe.uk/posts/scala/</link>
+    <pubDate>Sun, 29 May 2022 06:00:00 &#43;0100</pubDate>
+    <author>Daniel Scarfe</author>
+    <guid>https://scarfe.uk/posts/scala/</guid>
+    <description><![CDATA[]]></description>
+</item>
+</channel>
+</rss>
