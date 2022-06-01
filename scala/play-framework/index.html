@@ -25,11 +25,10 @@ We&rsquo;ll demonstrate (in Scala) how we can serve our content back to the user
 This tutorial shall provide the basis from which we can build efficient, scalable backend systems.
 Introducing the Play Framework Why choose Play?"/>
 <meta name="application-name" content="scarfe.uk">
-<meta name="apple-mobile-web-app-title" content="scarfe.uk"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://scarfe.uk/scala/play-framework/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+<meta name="apple-mobile-web-app-title" content="scarfe.uk"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://scarfe.uk/scala/play-framework/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><script type="application/ld+json">
     {
         "@context": "http://schema.org",
         "@type": "BlogPosting",
@@ -38,7 +37,7 @@ Introducing the Play Framework Why choose Play?"/>
         "mainEntityOfPage": {
             "@type": "WebPage",
             "@id": "https:\/\/scarfe.uk\/scala\/play-framework\/"
-        },"image": ["https:\/\/scarfe.uk\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "rest, scala, play, reactive, web","wordcount":  2147 ,
+        },"image": ["https:\/\/scarfe.uk\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "rest, play, reactive, web","wordcount":  2147 ,
         "url": "https:\/\/scarfe.uk\/scala\/play-framework\/","datePublished": "2022-05-29T06:00:00+01:00","dateModified": "2022-05-29T06:00:00+01:00","publisher": {
             "@type": "Organization",
             "name": "xxxx","logo": "https:\/\/scarfe.uk\/images\/avatar.png"},"author": {
@@ -49,11 +48,10 @@ Introducing the Play Framework Why choose Play?"/>
     </script>
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-TQG3SPNHY7"></script>
         <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'G-TQG3SPNHY7');
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-TQG3SPNHY7');
         </script>
     </head>
     <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('light' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'light' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
@@ -118,11 +116,9 @@ Introducing the Play Framework Why choose Play?"/>
                 <div class="container"><div class="toc" id="toc-auto">
             <h2 class="toc-title">Contents</h2>
             <div class="toc-content" id="toc-content-auto"></div>
-        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Building a REST API with Scala & Play</h1><div class="post-meta">
+        </div><article class="page single"><h1 class="single-title">Building a REST API with Scala & Play</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-category"><a href="/categories/scala/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>scala</a>&nbsp;|&nbsp;
                     </span><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-05-29">2022-05-29</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;2147 words&nbsp;
-                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;11 minutes&nbsp;
-                <span style="float: right"><i>Last updated on 2022-05-29</i></span>
             </div>
         </div><div class="details toc" id="toc-static"  data-kept="">
                 <div class="details-summary toc-title">
@@ -663,7 +659,7 @@ Introducing the Play Framework Why choose Play?"/>
     </div>
 
     <div class="post-info-more">
-        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/rest/">rest</a>,&nbsp;<a href="/tags/scala/">scala</a>,&nbsp;<a href="/tags/play/">play</a>,&nbsp;<a href="/tags/reactive/">reactive</a>,&nbsp;<a href="/tags/web/">web</a></section>
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/rest/">rest</a>,&nbsp;<a href="/tags/play/">play</a>,&nbsp;<a href="/tags/reactive/">reactive</a>,&nbsp;<a href="/tags/web/">web</a></section>
         <section>
             <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
         </section>
@@ -673,7 +669,7 @@ Introducing the Play Framework Why choose Play?"/>
 </div>
 <div id="comments"></div></article></div>
             </main><footer class="footer">
-        <div class="footer-container"><div class="footer-line">&copy; Daniel Scarfe | Powered by Hugo | Hosted on GitHub Pages</div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"></div>
+        <div class="footer-container"><div class="footer-line">&copy; Daniel Scarfe | Powered by Hugo</div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"></div>
         </div>
     </footer></div>
 

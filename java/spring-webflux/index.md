@@ -1,9 +1,11 @@
 # Building a REST API with Spring WebFlux
 
 
-In this article, we're going to build a *reactive* REST API in Java using Spring's WebFlux and annotation processing.
+In this article, we're going to build a *reactive* REST API in Java using Spring's WebFlux framework.
 
 We'll demonstrate how to make use of `Flux` and `Mono` publishers to serve JSON content to the client.
+
+We shall showcase both annotation-based & functional coding styles, so that you can decide which approach is best for you.
 
 This tutorial shall provide the basis from which we can build a reactive, scalable web backend in Java.
 

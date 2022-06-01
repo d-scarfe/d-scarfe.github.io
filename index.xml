@@ -11,10 +11,10 @@
     <pubDate>Mon, 30 May 2022 06:00:00 &#43;0100</pubDate>
     <author>Daniel Scarfe</author>
     <guid>https://scarfe.uk/java/spring-webflux/</guid>
-    <description><![CDATA[In this article, we&rsquo;re going to build a reactive REST API in Java using Spring&rsquo;s WebFlux and annotation processing.
+    <description><![CDATA[In this article, we&rsquo;re going to build a reactive REST API in Java using Spring&rsquo;s WebFlux framework.
 We&rsquo;ll demonstrate how to make use of Flux and Mono publishers to serve JSON content to the client.
-This tutorial shall provide the basis from which we can build a reactive, scalable web backend in Java.
-Introducing Spring WebFlux Why choose WebFlux? WebFlux is Spring&rsquo;s answer to the need for a non-blocking web stack that handles concurrency with fewer threads, and scales with less reliance upon physical hardware.]]></description>
+We shall showcase both annotation-based &amp; functional coding styles, so that you can decide which approach is best for you.
+This tutorial shall provide the basis from which we can build a reactive, scalable web backend in Java.]]></description>
 </item>
 <item>
     <title>Building a REST API with Scala &amp; Play</title>
