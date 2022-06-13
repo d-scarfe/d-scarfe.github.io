@@ -1,0 +1,16 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>scala syntax - Tag | Daniel Scarfe</title>
+        <link>https://scarfe.uk/tags/scala-syntax/</link>
+        <description>scala syntax - Tag | Daniel Scarfe</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 21 May 2022 06:00:00 &#43;0100</lastBuildDate><atom:link href="https://scarfe.uk/tags/scala-syntax/" rel="self" type="application/rss+xml" /><item>
+    <title>Introduction to Functions in Scala</title>
+    <link>https://scarfe.uk/scala/introducing-functions/</link>
+    <pubDate>Sat, 21 May 2022 06:00:00 &#43;0100</pubDate>
+    <author>Daniel Scarfe</author>
+    <guid>https://scarfe.uk/scala/introducing-functions/</guid>
+    <description><![CDATA[Scala is both an object-oriented (OO) and functional programming (FP) language. In practice, many businesses choose Scala for its functional approach which allows us to write complex code that is concise, performant and concurrent.
+Functional programming pushes the more basic programming tasks (such as list comprehension &amp; caching) down into the compiler. This reduces overhead &amp; results in fewer bugs. It also means that our code is easier to read and therefore easier to maintain.]]></description>
+</item>
+</channel>
+</rss>

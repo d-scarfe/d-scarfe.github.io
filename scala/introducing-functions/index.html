@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Introduction to Functions in Scala | Daniel Scarfe</title><meta name="Description" content="Hugo theme - LoveIt"><meta property="og:title" content="Introduction to Functions in Scala" />
+<meta property="og:description" content="Scala is both an object-oriented (OO) and functional programming (FP) language. In practice, many businesses choose Scala for its functional approach which allows us to write complex code that is concise, performant and concurrent.
+Functional programming pushes the more basic programming tasks (such as list comprehension &amp; caching) down into the compiler. This reduces overhead &amp; results in fewer bugs. It also means that our code is easier to read and therefore easier to maintain." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://scarfe.uk/scala/introducing-functions/" /><meta property="og:image" content="https://scarfe.uk/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-05-21T06:00:00+01:00" />
+<meta property="article:modified_time" content="2022-05-21T06:00:00+01:00" /><meta property="og:site_name" content="scarfe.uk" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://scarfe.uk/logo.png"/>
+
+<meta name="twitter:title" content="Introduction to Functions in Scala"/>
+<meta name="twitter:description" content="Scala is both an object-oriented (OO) and functional programming (FP) language. In practice, many businesses choose Scala for its functional approach which allows us to write complex code that is concise, performant and concurrent.
+Functional programming pushes the more basic programming tasks (such as list comprehension &amp; caching) down into the compiler. This reduces overhead &amp; results in fewer bugs. It also means that our code is easier to read and therefore easier to maintain."/>
+<meta name="application-name" content="scarfe.uk">
+<meta name="apple-mobile-web-app-title" content="scarfe.uk"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://scarfe.uk/scala/introducing-functions/" /><link rel="next" href="https://scarfe.uk/scala/play-framework/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Introduction to Functions in Scala",
+        "inLanguage": "en",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/scarfe.uk\/scala\/introducing-functions\/"
+        },"image": ["https:\/\/scarfe.uk\/images\/Apple-Devices-Preview.png"],"genre": "posts","keywords": "functional scala, scala syntax","wordcount":  1621 ,
+        "url": "https:\/\/scarfe.uk\/scala\/introducing-functions\/","datePublished": "2022-05-21T06:00:00+01:00","dateModified": "2022-05-21T06:00:00+01:00","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "https:\/\/scarfe.uk\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "Daniel Scarfe"
+            },"description": ""
+    }
+    </script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-TQG3SPNHY7"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-TQG3SPNHY7');
+        </script>
+    </head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('light' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'light' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="Daniel Scarfe">scarfe.uk</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/categories/java/"> Java </a><a class="menu-item" href="/categories/scala/"> Scala </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="Daniel Scarfe">scarfe.uk</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/categories/java/" title="">Java</a><a class="menu-item" href="/categories/scala/" title="">Scala</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title">Introduction to Functions in Scala</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-category"><a href="/categories/scala/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>scala</a>&nbsp;|&nbsp;
+                    </span><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-05-21">2022-05-21</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1621 words&nbsp;
+            </div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#anonymous-functions">Anonymous Functions</a>
+      <ul>
+        <li><a href="#functions-as-variables">Functions as variables</a></li>
+        <li><a href="#declaring-return-types">Declaring return types</a></li>
+      </ul>
+    </li>
+    <li><a href="#executing-functions">Executing Functions</a>
+      <ul>
+        <li><a href="#defining-our-method">Defining our method</a></li>
+        <li><a href="#triggering-the-behaviour">Triggering the behaviour</a></li>
+      </ul>
+    </li>
+    <li><a href="#increasing-complexity">Increasing Complexity</a>
+      <ul>
+        <li><a href="#multiple-parameters">Multiple parameters</a></li>
+      </ul>
+    </li>
+    <li><a href="#final-thoughts">Final Thoughts</a>
+      <ul>
+        <li><a href="#comparison-with-methods">Comparison with Methods</a></li>
+        <li><a href="#conclusion">Conclusion</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>Scala is both an object-oriented (OO) and functional programming (FP) language. In practice, many businesses choose Scala for its functional approach which allows us to write complex code that is concise, performant and concurrent.</p>
+<p>Functional programming pushes the more basic programming tasks (such as list comprehension &amp; caching) down into the compiler. This reduces overhead &amp; results in fewer bugs. It also means that our code is easier to read and therefore easier to maintain.</p>
+<p>In this article, we demonstrate several functional programming techniques, including the ability to define a function and pass it around as an instance. We&rsquo;ll showcase several examples of functional programming, and assess the advantages of this approach. We will also demonstrate several Scala programming shortcuts.</p>
+<h2 id="anonymous-functions">Anonymous Functions</h2>
+<p>We use anonymous functions, or <em>function literals</em>, when we need to pass a function into a method or assign it to a variable.</p>
+<p>Let us imagine we wish to filter a list of numbers, extracting only the even values. We can do this with an anonymous function:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">val</span> <span class="n">rawList</span> <span class="k">=</span> <span class="nc">List</span><span class="o">.</span><span class="n">range</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">20</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">val</span> <span class="n">evenList</span> <span class="k">=</span> <span class="n">rawList</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="n">i</span> <span class="k">=&gt;</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Here we can see that <code>i</code> is <em>transformed</em>, and the values are filtered only if <code>i % 2</code> is equal to zero (and so the number is even).</p>
+<p>The above example demonstrates a more traditional coding style. However, because <code>i</code> is used in only one statement inside our function literal, we can make use of Scala&rsquo;s <code>_</code> wildcard to simplify things further:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">val</span> <span class="n">evenList</span> <span class="k">=</span> <span class="n">rawList</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="k">_</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The two statements are equivalent in operation, but the latter is easier to read &amp; requires less code. The <code>_</code> shortcut is used throughout Scala when dealing with a functional programming model.</p>
+<h3 id="functions-as-variables">Functions as variables</h3>
+<p>A function is really no different to any other object, so we can treat it much like we might treat a <code>String</code> or <code>Int</code>.</p>
+<p>We can simply assign a function literal to a variable, and then invoke it as required:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">val</span> <span class="n">double</span> <span class="k">=</span> <span class="o">(</span><span class="n">i</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">2</span>
+</span></span><span class="line"><span class="cl"><span class="n">double</span><span class="o">(</span><span class="mi">5</span><span class="o">)</span>  <span class="c1">// Returns 10
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">double</span><span class="o">(</span><span class="mi">10</span><span class="o">)</span> <span class="c1">// Returns 20
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>In the above, we define a function capable of doubling a given <code>Int</code> value, and then we store it in a variable.</p>
+<p>As we now have an instance of a function, we consider this a <em>function value</em>.</p>
+<p>We can now pass this into a <code>.map()</code> call on our <em>rawList</em>, resulting in the doubling of all values within:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">val</span> <span class="n">doubledList</span> <span class="k">=</span> <span class="n">rawList</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">i</span> <span class="k">=&gt;</span> <span class="n">double</span><span class="o">(</span><span class="n">i</span><span class="o">))</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Again, we have demonstrated a traditional coding style here and readers may notice that we could utilise a <code>_</code> shortcut in place of <code>i</code>.</p>
+<p>However, we can make use of another Scala shortcut to simplify things even further than that. Because our function literal consists only of a single statement that takes a single argument, we do not need to pass in the value at all:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">val</span> <span class="n">doubledList</span> <span class="k">=</span> <span class="n">rawList</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">double</span><span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In just two short lines of code, we have defined a function that can transform an argument, and executed our function on a collection.</p>
+<h3 id="declaring-return-types">Declaring return types</h3>
+<p>It is not necessary to declare a return type for a Scala function, and in many cases it may not feel appropriate. For example, let us consider our function from earlier:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">val</span> <span class="n">isEven</span> <span class="k">=</span> <span class="o">(</span><span class="n">i</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Most programmers can immediately infer that the return type here is a <code>Boolean</code>, and the Scala compiler is clever enough to work it out too.</p>
+<p>However, we&rsquo;ve picked a wonderfully simple function to showcase. When things become more complicated, declaring the return type can make the code more readable and therefore more maintainble. An example of the two styles in practice:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="c1">// Implicit approach - no return declaration.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">val</span> <span class="n">multiply</span> <span class="k">=</span> <span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">b</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Explicit approach - declaring Int return type.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">val</span> <span class="n">multiply</span> <span class="k">=</span> <span class="o">(</span><span class="nc">Int</span><span class="o">,</span> <span class="nc">Int</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Int</span> <span class="k">=</span> <span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>For the most part, you will find that Scala programmers tend to prefer the implicit approach. It&rsquo;s concise and once you are familiar with functional programming, it tends to feel more natural.</p>
+<p>However, there are plenty of times that a function becomes complicated enough to justify declaring the return type, so it is a case of deciding what feels appropriate given the circumstances.</p>
+<h2 id="executing-functions">Executing Functions</h2>
+<p>We&rsquo;ve seen how powerful an anonymous function can be, and in the section that follows we will explore how to define a method that takes a simple function as a parameter &amp; executes it.</p>
+<h3 id="defining-our-method">Defining our method</h3>
+<p>The general syntax for defining a method which accepts a function in its signature is as follows:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">def</span> <span class="n">methodName</span><span class="o">(</span><span class="n">functionName</span><span class="k">:</span><span class="o">(</span><span class="kt">parameters</span><span class="o">)</span> <span class="o">=&gt;</span> <span class="n">returnType</span><span class="o">)</span> <span class="o">{</span> <span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Therefore, the most simple functional method might look like so:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">def</span> <span class="n">execute</span><span class="o">(</span><span class="n">f</span><span class="k">:</span><span class="o">()</span> <span class="o">=&gt;</span> <span class="nc">Unit</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">f</span><span class="o">()</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In the above example, we create a <code>.execute()</code> method that takes a function <code>f</code> with no parameters and returns a <code>Unit</code>. In Scala, a <code>Unit</code> is similar to that of Java&rsquo;s <code>Void</code>, so we are indicating that we are effectively going to return nothing here.</p>
+<p>In reality though, you&rsquo;re probably going to need some parameters, so let&rsquo;s adapt our method to expect a function with a <code>String</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">def</span> <span class="n">print</span><span class="o">(</span><span class="n">f</span><span class="k">:</span><span class="o">()</span> <span class="o">=&gt;</span> <span class="nc">String</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">println</span><span class="o">(</span><span class="n">f</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Now, we&rsquo;ve effectively aliased the &ldquo;println&rdquo; method with our own implementation that expects a function returning a String. Of course, this is not something you&rsquo;d likely do in the real-world, but it is useful for the purpose of this tutorial.</p>
+<h3 id="triggering-the-behaviour">Triggering the behaviour</h3>
+<p>We now define a function that matches our method&rsquo;s signature, and pass it to our method:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">val</span> <span class="n">helloWorld</span> <span class="k">=</span> <span class="o">()</span> <span class="k">=&gt;</span> <span class="s">&#34;Hello&#34;</span> <span class="o">+</span> <span class="s">&#34; &#34;</span> <span class="o">+</span> <span class="s">&#34;World!&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">print</span><span class="o">(</span><span class="n">helloWorld</span><span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Later, if we decide we want to change our behaviour, we needn&rsquo;t change the method but merely the function:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">case</span> <span class="k">class</span> <span class="nc">Person</span><span class="o">(</span><span class="n">name</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">val</span> <span class="n">openDoors</span> <span class="k">=</span> <span class="o">()</span> <span class="k">=&gt;</span> <span class="s">&#34;Open the pod bay doors&#34;</span> <span class="o">+</span> <span class="nc">Person</span><span class="o">(</span><span class="s">&#34;Hal&#34;</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">val</span> <span class="n">sorryDave</span> <span class="k">=</span> <span class="o">()</span> <span class="k">=&gt;</span> <span class="s">&#34;I&#39;m sorry&#34;</span> <span class="o">+</span> <span class="nc">Person</span><span class="o">(</span><span class="s">&#34;Dave&#34;</span><span class="o">)</span> <span class="o">+</span> <span class="s">&#34;, I can&#39;t do that.&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">print</span><span class="o">(</span><span class="n">openDoors</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">print</span><span class="o">(</span><span class="n">sorryDave</span><span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>One method definition, with two separate calls using different functions, results in completely different behaviour.</p>
+<h2 id="increasing-complexity">Increasing Complexity</h2>
+<p>So far we have only looked at functions that perform basic mathematics or the printing of String values to the console.</p>
+<p>However, the main advantage of the functional approach only becomes obvious when we start to increase the complexity.</p>
+<p>In the section that follows, we are going to look at some more complicated function examples with real-world usages.</p>
+<h3 id="multiple-parameters">Multiple parameters</h3>
+<p>Eagle-eyed readers may have noticed a multiple parameter example earlier, when assessing return type declarations. Let&rsquo;s go ahead and reuse our <code>multiply</code> function, and create a new <code>sum</code> function too:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">val</span> <span class="n">multiply</span> <span class="k">=</span> <span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">b</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">a</span> <span class="o">*</span> <span class="n">b</span>
+</span></span><span class="line"><span class="cl"><span class="k">val</span> <span class="n">sum</span> <span class="k">=</span> <span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">b</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>In both examples above, our function expects two <code>Int</code> parameters and then performs an operation on those values. We don&rsquo;t specify the return type, but we can infer from the behaviour that it is going to be an <code>Int</code> value.</p>
+<p>We can now adapt our print method from earlier, to expect a function &amp; two parameters:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">def</span> <span class="n">print</span><span class="o">(</span><span class="n">f</span><span class="k">:</span><span class="o">(</span><span class="kt">Int</span><span class="o">,</span> <span class="kt">Int</span><span class="o">),</span> <span class="n">a</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">b</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">val</span> <span class="n">result</span> <span class="k">=</span> <span class="n">f</span><span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">println</span><span class="o">(</span><span class="n">result</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The <code>print</code> method will now execute our function using the parameters provided, and then print the result to the console:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="n">print</span><span class="o">(</span><span class="n">multiply</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">10</span><span class="o">)</span> <span class="c1">// Prints &#34;20&#34;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">print</span><span class="o">(</span><span class="n">sum</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">10</span><span class="o">)</span>      <span class="c1">// Prints &#34;12&#34;
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>What&rsquo;s clever is that the method does not know which function is ran. It takes the parameters <code>a</code> and <code>b</code> and it passes them to the function.</p>
+<p>It doesn&rsquo;t care what our function is doing, all it is concerned with is printing the result. The logic for the function is defined elsewhere.</p>
+<h2 id="final-thoughts">Final Thoughts</h2>
+<h3 id="comparison-with-methods">Comparison with Methods</h3>
+<p>In Scala, it is entirely possible to define a method on a class &amp; pass it around as we did with our anonymous function.</p>
+<p>Let&rsquo;s create an isEven method like so:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">def</span> <span class="n">isEven</span><span class="o">(</span><span class="n">i</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="k">=</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Once again we have not specified the return type of <code>Boolean</code> because it is not compulsory in Scala. It can be inferred from looking at the method statement, but usually I would advise also naming the method appropriately too. Here, <code>isEven()</code> implies a true or false response, and hence we don&rsquo;t need to specify our return type.</p>
+<p>Now we are able to pass our method instance into any function that takes an <code>Int</code> and expects a <code>Boolean</code> response. One such example is the <code>filter()</code> function on a collection. Rather than defining a new predicate, we can simply pass our method instance:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-scala" data-lang="scala"><span class="line"><span class="cl"><span class="k">val</span> <span class="n">evenList</span> <span class="k">=</span> <span class="n">rawList</span><span class="o">.</span><span class="n">filter</span><span class="o">(</span><span class="n">isEven</span><span class="o">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>So what&rsquo;s the difference between defining a method &amp; defining a function? Well the answer is, not a lot. One is a method attributed to a class, the other is a function assigned to a variable. They are both valid solutions to a single problem.</p>
+<p>There are some differences &ldquo;under the hood&rdquo;. Specifically, the function implements one of the several <em>Function</em> traits whereas the method does not. Scala doesn&rsquo;t really care, and you shouldn&rsquo;t either. Pick whichever style works for you &amp; your current code base.</p>
+<h3 id="conclusion">Conclusion</h3>
+<p>In this article, we reviewed how to create &amp; use functions within Scala. We built some basic example functions, and then we wired them into a method call and demonstrated how to pass parameters into the function.</p>
+<p>We showcased how we can use functions to abstract away complicated behaviour into small, well-scoped units of code. This will form the cornerstone of our work in Scala, and promotes a better programming style with reduced complexity.</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/functional-scala/">functional scala</a>,&nbsp;<a href="/tags/scala-syntax/">scala syntax</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+            <a href="/scala/play-framework/" class="next" rel="next" title="Building a REST API with Scala &amp; Play">Building a REST API with Scala & Play<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+<div id="comments"></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">&copy; Daniel Scarfe | Powered by Hugo</div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.13.0/dist/algoliasearch-lite.umd.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"algoliaAppID":"","algoliaIndex":"","algoliaSearchKey":"","highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30,"type":"algolia"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>
